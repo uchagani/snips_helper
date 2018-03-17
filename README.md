@@ -24,13 +24,14 @@ wget http://security.debian.org/debian-security/pool/updates/main/c/chromium-bro
 ```
 
 ## Install Chrome
+
+This will error because of dependencies.  This is okay and will be fixed in the next step.
 ```
-#this will error because of dependencies.  This is okay and will be fixed in the next step.
 sudo dpkg -i chromium_63.0.3239.84-1~deb9u1_armhf.deb
 ```
 
+This will install the the necessary dependencies of chromium
 ```
-#this will install the the necessary dependencies of chromium
 sudo apt-get install -f
 ```
 
