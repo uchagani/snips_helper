@@ -1,6 +1,6 @@
 A quick helper to make re-training and downloading [Snips.ai](https://console.snips.ai) assistants easier using a headless chrome browser.
 
-Install
+## Install
 
 ```
 pip3 install snips_helper
