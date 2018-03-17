@@ -1,12 +1,12 @@
 A quick helper to make re-training and downloading [Snips.ai](https://console.snips.ai) assistants easier using a headless chrome browser.
 
-Install
+## Install
 
 ```
 pip3 install snips_helper
 ```
 
-The installations instructions below are have been tested on a raspberry pi 3 with Raspbian Stretch Lite.  For other platforms, install the latest chrome browser and chromedriver.  See Usage at the end of this document for instructions on how to use snips-helper.  This has only been tested with python3 and as such is listed as a requirement.
+The installation instructions below have been tested on a raspberry pi 3 with Raspbian Stretch Lite.  For other platforms, install the latest chrome browser and chromedriver.  See Usage at the end of this document for instructions on how to use snips_helper.  This has only been tested with python3 and as such is listed as a requirement.
 
 ## Pre-reqs
 ```
@@ -24,13 +24,14 @@ wget http://security.debian.org/debian-security/pool/updates/main/c/chromium-bro
 ```
 
 ## Install Chrome
+
+This will error because of dependencies.  This is okay and will be fixed in the next step.
 ```
-#this will error because of dependencies.  This is okay and will be fixed in the next step.
 sudo dpkg -i chromium_63.0.3239.84-1~deb9u1_armhf.deb
 ```
 
+This will install the the necessary dependencies of chromium
 ```
-#this will install the the necessary dependencies of chromium
 sudo apt-get install -f
 ```
 
