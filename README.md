@@ -6,7 +6,7 @@ A quick helper to make re-training and downloading [Snips.ai](https://console.sn
 pip3 install snips_helper
 ```
 
-The installations instructions below are have been tested on a raspberry pi 3 with Raspbian Stretch Lite.  For other platforms, install the latest chrome browser and chromedriver.  See Usage at the end of this document for instructions on how to use snips-helper.  This has only been tested with python3 and as such is listed as a requirement.
+The installation instructions below have been tested on a raspberry pi 3 with Raspbian Stretch Lite.  For other platforms, install the latest chrome browser and chromedriver.  See Usage at the end of this document for instructions on how to use snips_helper.  This has only been tested with python3 and as such is listed as a requirement.
 
 ## Pre-reqs
 ```
