@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='snips_helper',
-      version='0.2',
+      version='0.3',
       description='Snips.ai Helper',
       url='http://github.com/uchagani/snips_helper',
       author='Umair Chagani',
