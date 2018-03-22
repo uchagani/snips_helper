@@ -30,7 +30,7 @@ class ConsoleHelper:
         command_result = self.driver.execute("send_command", params)
         self.driver.implicitly_wait(self.IMPLICIT_DELAY)
 
-    def login(self, email, password):
+    def login(self, email, password, assistant=None):
         self.driver.get(self.LOGIN_URL)
         self.handle_cookie_message()
         email_field = self.driver.find_element_by_name('email')
@@ -38,6 +38,16 @@ class ConsoleHelper:
         email_field.send_keys(email)
         password_field.send_keys(password)
         password_field.submit()
+
+        if assistant is not None:
+            self.change_assistant(assistant)
+    
+    def change_assistant(self, assistant):
+        assistant_selector = self.driver.find_element_by_class_name("header-assistants-select")
+        assistant_selector.click()
+        assistant_options = self.driver.find_element_by_class_name("Select-menu-outer")
+        assistant = assistant_options.find_element_by_css_selector("div[aria-label='{}']".format(assistant))
+        assistant.click()
     
     def handle_cookie_message(self):
         try:

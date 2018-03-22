@@ -47,7 +47,15 @@ from snips_helper import ConsoleHelper
 
 snips_helper = ConsoleHelper(chrome_driver_path='/chromedriver/path', download_dir='/assistant/download/path')
 
+#login to the console and use the last assistant that was loaded
 snips_helper.login("your@email.com", "your_p@$$word")
+
+#you can also login to a specific assistant by passing in the assistant name.
+#the name is case sensitive because the snips console is case-sensitive
+snips_helper.login("your@email.com", "your_p@$$word", 'jarvis')
+
+#or you can manually change your assitant after you login with
+snips_helper.change_assistant('jarvis')
 
 #retrain snips assistant
 snips_helper.retrain_assistant()
