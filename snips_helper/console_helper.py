@@ -66,10 +66,114 @@ class ConsoleHelper:
         intent.click()
         save_button = self.driver.find_element_by_class_name('save-intent-button')
         save_button.click()
+    
+    def get_assistant(self, assistant):
+        # Can read the html to get the entire windows state
+        # and return the assistant part of it
+        assistant = {
+            "id": "proj_TEST",
+            "title": "Test",
+            "userId": "user_TEST",
+            "language": "en",
+            "analyticsEnabled": true,
+            "hotwordId": "jarvis",
+            "platform": {
+                "type": "id",
+                "id": "$Assistant:proj_TEST.platform",
+                "generated": true
+            },
+            "asr": {
+                "type": "id",
+                "id": "$Assistant:proj_TEST.asr",
+                "generated": true
+            },
+            "__typename": "Assistant",
+            "bundles": [{
+                "type": "id",
+                "id": "Bundle:bundle_TEST",
+                "generated": false
+            }],
+            "training": {
+                "type": "id",
+                "id": "$Assistant:proj_TEST.training",
+                "generated": true
+            },
+            "languagemodel": {
+                "type": "id",
+                "id": "$Assistant:proj_TEST.languagemodel",
+                "generated": true
+            }
+        }
+        return Assistant(
+
+        def get_bundles(self, assistant, bundle):
+            # select the assistant
+            # can read the html to get the entire windows state
+            # and return the specific bundle as a python dict
+            bundle = {"Bundle:bundle_TEST": {
+                        "id": "bundle_TEST",
+                        "__typename": "Bundle",
+                        "name": "Weather",
+                        "description": "Ask questions",
+                        "language": "en",
+                        "userId": "user_TEST",
+                        "username": "Snips",
+                        "private": false,
+                        "canCustomize": null,
+                        "imageUrl": "https://console.snips.ai/images/bundles/bundle-sun.svg",
+                        "hidden": null,
+                        "migrated": null,
+                        "forked": null,
+                        "statistics": {
+                            "type": "id",
+                            "id": "$Bundle:bundle_TEST.statistics",
+                            "generated": true
+                        },
+                        "rating": {
+                            "type": "id",
+                            "id": "$Bundle:bundle_TEST.rating",
+                            "generated": true
+                        },
+                        "intents": [{
+                            "type": "id",
+                            "id": "PartialIntent:intent_TEST",
+                            "generated": false
+                        }]
+                    }}
+            return bundle
 
     def download_assistant(self, timeout=60):        
         download_button = WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "[download]")))
         download_button = self.driver.find_element_by_css_selector("[download]")
         download_button.click()
 
+Class Assistant:
+    # So assistant now has a list of bundles as self.bundles
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
         
+    def get_bundle(self, bundle)
+        """Return a Bundle object."""
+        return Bundle(ConsoleHelper.get_bundle(self, bundle))
+
+Class Bundle:
+    # So bundle now has a list of intents as self.intents
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+
+    def export_slots(self, intent)
+        # need to find out slots which have unique ids
+        return True
+
+    def export_training_examples(self, intent)
+        # these are utterances but pretty straightforward
+        return True
+
+    def import_slot(self, intent, slot)
+        return True
+
+    def import_training_examples(self, intent)
+        # these are utterances but pretty straightforward
+        return True
+
+    
