@@ -3,6 +3,7 @@ from .intent import Intent
 
 class Bundle:
     def __init__(self, name, driver):
+        print("Creating bundle: {}".format(name))
         self.__name = name
         self.__driver = driver
 
@@ -21,9 +22,11 @@ class Bundle:
         return self.driver.find_element_by_xpath(selector)
 
     def __activate(self):
+        print("Selecting bundle: {}".format(self.name))
         self.__get_bundle().click()
 
     def get_intents(self):
+        print("Getting intents for: {}".format(self.name))
         self.__activate()
         intent_elements = self.driver.find_elements_by_class_name(
             'assistant-intent__title')

@@ -9,7 +9,7 @@ from .bundle import Bundle
 
 class ConsoleHelper:
     LOGIN_URL = 'https://console.snips.ai/login'
-    IMPLICIT_DELAY = 30
+    IMPLICIT_DELAY = 10
 
     def __init__(self, chrome_driver_path='/usr/bin/chromedriver',
                  download_dir=None, headless=True):
@@ -28,9 +28,11 @@ class ConsoleHelper:
             "safebrowsing.enabled": True
         })
 
+        print("Creating chrome driver")
         self.driver = webdriver.Chrome(chrome_options=self.chrome_options,
                                        executable_path=chrome_driver_path)
 
+        print("Sending command to enable headless downloads")
         self.driver.command_executor._commands["send_command"] = (
             "POST", '/session/$sessionId/chromium/send_command')
         params = {'cmd': 'Page.setDownloadBehavior',
@@ -40,23 +42,31 @@ class ConsoleHelper:
         self.driver.execute("send_command", params)
         self.driver.implicitly_wait(self.IMPLICIT_DELAY)
 
+        print("Setting window size to maximize")
         self.driver.set_window_position(0,0)
         self.driver.set_window_size(4096, 2160)
         self.driver.maximize_window()
 
     def login(self, email, password, assistant=None):
+        print("Navigating to Snips Console")
         self.driver.get(self.LOGIN_URL)
         self.handle_cookie_message()
+        print("Getting email field")
         email_field = self.driver.find_element_by_name('email')
-        password_field = self.driver.find_element_by_name('password')
+        print("Setting email field")
         email_field.send_keys(email)
+        print("Getting password field")
+        password_field = self.driver.find_element_by_name('password')
+        print("Setting password field")
         password_field.send_keys(password)
+        print("Submitting login")
         password_field.submit()
 
         if assistant is not None:
             self.change_assistant(assistant)
 
     def change_assistant(self, assistant):
+        print("Changing assistant")
         assistant_selector = self.driver.find_element_by_class_name(
             "header-assistants-select")
         assistant_selector.click()
@@ -70,6 +80,7 @@ class ConsoleHelper:
         try:
             cookies_button = self.driver.find_element_by_class_name(
                 'cookies-usage-info__ok-button')
+            print("Handling cookie message")
             cookies_button.click()
         except:
             return
@@ -79,6 +90,7 @@ class ConsoleHelper:
             'header-assistants-select__label')
 
     def get_bundles(self):
+        print("Changing bundles")
         bundle_elements = self.driver.find_elements_by_class_name(
             'bundle-header__title')
         bundles = []
@@ -88,16 +100,19 @@ class ConsoleHelper:
         return bundles
 
     def retrain_assistant(self):
+        print("Retraining assistant")
         self.get_header().click()
         bundle = self.get_bundles()[0]
         intent = bundle.get_intents()[0]
         intent.save()
 
     def get_download_button(self, timeout):
+        print("Getting download button")
         return WebDriverWait(self.driver, timeout).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "[download]")))
 
     def get_download_close_button(self, timeout):
+        print("Getting download close button")
         download_modal = WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, "download-assistant-modal")))
@@ -107,5 +122,6 @@ class ConsoleHelper:
                 (By.XPATH, "//*[text()='Close']")))
 
     def download_assistant(self, timeout=120):
+        print("Downloading assistant")
         self.get_download_button(timeout).click()
         self.get_download_close_button(timeout).click()
