@@ -4,6 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 import os
+from .bundle import Bundle
 
 
 class ConsoleHelper:
@@ -20,7 +21,7 @@ class ConsoleHelper:
             self.chrome_options.add_argument("--headless")
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--no-sandbox")
-        self.chrome_options.add_argument("--window-size=1920x1080")
+        # self.chrome_options.add_argument("--window-size=1920x1080")
         self.chrome_options.add_experimental_option("prefs", {
             "download.default_directory": download_dir,
             "download.prompt_for_download": False,
@@ -39,6 +40,10 @@ class ConsoleHelper:
 
         self.driver.execute("send_command", params)
         self.driver.implicitly_wait(self.IMPLICIT_DELAY)
+
+        self.driver.set_window_position(0,0)
+        self.driver.set_window_size(4096, 2160)
+        self.driver.maximize_window()
 
     def login(self, email, password, assistant=None):
         self.driver.get(self.LOGIN_URL)
@@ -75,7 +80,13 @@ class ConsoleHelper:
             'header-assistants-select__label')
 
     def get_bundles(self):
-        return self.driver.find_elements_by_class_name('bundle-section__card')
+        bundle_elements = self.driver.find_elements_by_class_name(
+            'bundle-header__title')
+        bundles = []
+        for bundle_element in bundle_elements:
+            bundles.append(Bundle(bundle_element.text, self.driver))
+
+        return bundles
 
     def get_intents(self):
         return self.driver.find_elements_by_class_name(
