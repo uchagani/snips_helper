@@ -21,7 +21,6 @@ class ConsoleHelper:
             self.chrome_options.add_argument("--headless")
         self.chrome_options.add_argument("--disable-gpu")
         self.chrome_options.add_argument("--no-sandbox")
-        # self.chrome_options.add_argument("--window-size=1920x1080")
         self.chrome_options.add_experimental_option("prefs", {
             "download.default_directory": download_dir,
             "download.prompt_for_download": False,
@@ -88,18 +87,11 @@ class ConsoleHelper:
 
         return bundles
 
-    def get_intents(self):
-        return self.driver.find_elements_by_class_name(
-            'assistant-intent__title')
-
-    def get_save_button(self):
-        return self.driver.find_element_by_class_name('save-intent-button')
-
     def retrain_assistant(self):
         self.get_header().click()
-        self.get_bundles()[0].click()
-        self.get_intents()[0].click()
-        self.get_save_button().click()
+        bundle = self.get_bundles()[0]
+        intent = bundle.get_intents()[0]
+        intent.save()
 
     def get_download_button(self, timeout):
         return WebDriverWait(self.driver, timeout).until(

@@ -1,3 +1,5 @@
+import time
+
 class Intent:
     def __init__(self, name, driver):
         self.__name = name
@@ -20,6 +22,12 @@ class Intent:
         self.__deactivate()
         return training_data
 
+    def save(self):
+        self.__activate()
+        self.__get_save_button().click()
+        time.sleep(1)
+        self.__deactivate()
+
     def __activate(self):
         self.__get_intent().click()
 
@@ -34,6 +42,9 @@ class Intent:
 
     def __get_back_to_assistant_button(self):
         return self.driver.find_element_by_link_text('Back to Assistant')
+
+    def __get_save_button(self):
+        return self.driver.find_element_by_class_name('save-intent-button')
 
     def __get_export_headers(self):
         return self.driver.find_elements_by_class_name(
@@ -65,4 +76,3 @@ class Intent:
     def __get_modal_close_button(self):
         modal = self.__get_modal()
         return modal.find_element_by_xpath("//*[text()='Close']")
-
