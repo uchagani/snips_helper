@@ -70,6 +70,7 @@ class ConsoleHelper:
         assistant_selector = self.driver.find_element_by_class_name(
             "header-assistants-select")
         assistant_selector.click()
+        WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "Select-menu-outer")))
         assistant_options = self.driver.find_element_by_class_name(
             "Select-menu-outer")
         assistant = assistant_options.find_element_by_css_selector(

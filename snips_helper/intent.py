@@ -24,9 +24,20 @@ class Intent:
         self.__deactivate()
         return training_data
 
+    def import_utterances(self, utterances):
+        print("Importing utterances")
+        self.__activate()
+        self.__get_utterance_dot_button().click()
+        self.__get_import_utterance_button().click()
+        self._get_modal_text_area().send_keys(utterances)
+        self.__get_modal_import_button().click()
+        time.sleep(1)
+        self.save()
+        return
+
     def save(self):
         print("Saving intent: {}".format(self.name))
-        self.__activate()
+        #self.__activate()
         self.__get_save_button().click()
         time.sleep(1)
         self.__deactivate()
@@ -59,6 +70,11 @@ class Intent:
         return self.driver.find_elements_by_class_name(
             'intent-editor-section-header')
 
+    def __get_import_headers(self):
+        print("Get import headers")
+        return self.driver.find_elements_by_class_name(
+            'intent-editor-section-header')
+
     def __get_utterance_section(self):
         print("Get utterance section")
         return self.__get_export_headers()[1]
@@ -71,6 +87,11 @@ class Intent:
     def __get_export_utterance_button(self):
         print("Get export utterance button")
         selector = "//*[text()='Export Training Examples']"
+        return self.driver.find_element_by_xpath(selector)
+
+    def __get_import_utterance_button(self):
+        print("Get import utterance button")
+        selector = "//*[text()='Import Training Examples']"
         return self.driver.find_element_by_xpath(selector)
 
     def __get_modal(self):
@@ -92,3 +113,8 @@ class Intent:
         print("Get modal close button")
         modal = self.__get_modal()
         return modal.find_element_by_xpath("//*[text()='Close']")
+
+    def __get_modal_import_button(self):
+        print("Get modal import button")
+        modal = self.__get_modal()
+        return modal.find_element_by_xpath("//*[text()='Import']")
