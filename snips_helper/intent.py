@@ -35,9 +35,16 @@ class Intent:
         self.save()
         return
 
+    def delete_utterances(self):
+        print("Importing utterances")
+        self.__activate()
+        while self.__get_utterance_delete_button():
+            self.__get_utterance_delete_button().click()
+        self.save()
+        return
+
     def save(self):
         print("Saving intent: {}".format(self.name))
-        #self.__activate()
         self.__get_save_button().click()
         time.sleep(1)
         self.__deactivate()
@@ -78,6 +85,12 @@ class Intent:
     def __get_utterance_section(self):
         print("Get utterance section")
         return self.__get_export_headers()[1]
+
+    def __get_utterance_delete_button(self):
+        print("Get utterance delete button")
+        selector = 'button--unstyled'
+        utterance_section = self.__get_utterance_section()
+        return utterance_section.find_element_by_class_name(selector)
 
     def __get_utterance_dot_button(self):
         print("Get utterance dot button")
