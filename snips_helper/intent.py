@@ -25,6 +25,16 @@ class Intent:
         self.__deactivate()
         return training_data
 
+    def slots(self):
+        if self.__debug: print("Getting slots")
+        self.__activate()
+        self.__get_slot_dot_button().click()
+        self.__get_export_slot_button().click()
+        slots = self.__get_modal_text_area().text.split("\n")
+        self.__get_modal_close_button().click()
+        self.__deactivate()
+        return slots
+
     def import_utterances(self, utterances):
         if self.__debug: print("Importing utterances")
         self.__activate()
@@ -108,6 +118,25 @@ class Intent:
     def __get_import_utterance_button(self):
         if self.__debug: print("Get import utterance button")
         selector = "//*[text()='Import Training Examples']"
+        return self.driver.find_element_by_xpath(selector)
+
+    def __get_slot_section(self):
+        if self.__debug: print("Get slot section")
+        return self.__get_export_headers()[0]
+
+    def __get_slot_dot_button(self):
+        if self.__debug: print("Get slot dot button")
+        utterance_section = self.__get_slot_section()
+        return utterance_section.find_element_by_class_name('dots-icon-button')
+
+    def __get_export_slot_button(self):
+        if self.__debug: print("Get export slot button")
+        selector = "//*[text()='Export Slots']"
+        return self.driver.find_element_by_xpath(selector)
+
+    def __get_import_slot_button(self):
+        if self.__debug: print("Get import slot button")
+        selector = "//*[text()='Import Slots']"
         return self.driver.find_element_by_xpath(selector)
 
     def __get_modal(self):
