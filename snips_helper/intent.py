@@ -33,6 +33,7 @@ class Intent:
         slots = self.__get_modal_text_area().text.split("\n")
         self.__get_modal_close_button().click()
         self.__deactivate()
+        if slots == ['']: slots = []
         return slots
 
     def export_slot_values(self, slot):
@@ -176,6 +177,9 @@ class Intent:
         if self.__debug: print("Get slot editor button")
         editor_row = self.__get_slot_editor_row(slot)
         if not editor_row:
+            return None
+        if editor_row.find_element_by_class_name(
+                'item-option__subtitle').text == 'builtin':
             return None
         editor_button = editor_row.find_element_by_class_name(
                 'slot-editor--action-button')
