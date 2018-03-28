@@ -1,12 +1,13 @@
 from .intent import Intent
+import logging
 
 
 class Bundle:
-    def __init__(self, name, driver, debug):
-        if debug: print("Creating bundle: {}".format(name))
+    def __init__(self, name, driver):
+        self.logger = logging.getLogger('snips_helper')
+        self.logger.debug("Creating bundle: {}".format(name))
         self.__name = name
         self.__driver = driver
-        self.__debug = debug
 
     @property
     def name(self):
@@ -23,17 +24,17 @@ class Bundle:
         return self.driver.find_element_by_xpath(selector)
 
     def __activate(self):
-        if self.__debug: print("Selecting bundle: {}".format(self.name))
+        self.logger.debug("Selecting bundle: {}".format(self.name))
         self.__get_bundle().click()
 
     def get_intents(self):
-        if self.__debug: print("Getting intents for: {}".format(self.name))
+        self.logger.debug("Getting intents for: {}".format(self.name))
         self.__activate()
         intent_elements = self.driver.find_elements_by_class_name(
             'assistant-intent__title')
 
         intents = []
         for intent in intent_elements:
-            intents.append(Intent(intent.text, self.driver, self.__debug))
+            intents.append(Intent(intent.text, self.driver))
 
         return intents
