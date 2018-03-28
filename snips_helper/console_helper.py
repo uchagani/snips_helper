@@ -66,6 +66,9 @@ class ConsoleHelper:
         if assistant is not None:
             self.change_assistant(assistant)
 
+    def quit(self):
+        self.driver.quit()
+
     def change_assistant(self, assistant):
         if self.debug: print("Changing assistant")
         assistant_selector = self.driver.find_element_by_class_name(
@@ -88,7 +91,7 @@ class ConsoleHelper:
         try:
             cookies_button = self.driver.find_element_by_class_name(
                 'cookies-usage-info__ok-button')
-            print("Handling cookie message")
+            if self.debug: print("Handling cookie message")
             cookies_button.click()
         except:
             return
@@ -98,7 +101,7 @@ class ConsoleHelper:
             'header-assistants-select__label')
 
     def get_bundles(self):
-        print("Changing bundles")
+        if self.debug: print("Changing bundles")
         bundle_elements = self.driver.find_elements_by_class_name(
             'bundle-header__title')
         bundles = []

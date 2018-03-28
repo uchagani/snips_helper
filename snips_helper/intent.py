@@ -25,6 +25,33 @@ class Intent:
         self.__deactivate()
         return training_data
 
+    def slots(self):
+        if self.__debug: print("Getting slots")
+        self.__activate()
+        self.__get_slots_dot_button().click()
+        self.__get_export_slots_button().click()
+        slots = self.__get_modal_text_area().text.split("\n")
+        self.__get_modal_close_button().click()
+        self.__deactivate()
+        if slots == ['']: slots = []
+        return slots
+
+    def export_slot_values(self, slot):
+        if self.__debug: print("Getting slot: {}".format(slot))
+        self.__activate()
+        if self.__get_slot_editor_button(slot):
+            self.__get_slot_editor_button(slot).click()
+        else:
+            if self.__debug: print("No slots found {}".format(self.__get_slot_editor_button(slot)))
+            self.__deactivate()
+            return None
+        self.__get_slot_modal_export_button().click()
+        slot_values = self.__get_modal_text_area().text.split("\n")
+        self.__get_slot_modal_dialog_close_button().click()
+        self.__get_slot_modal_close_button().click()
+        self.__deactivate()
+        return slot_values
+
     def import_utterances(self, utterances):
         if self.__debug: print("Importing utterances")
         self.__activate()
@@ -109,6 +136,86 @@ class Intent:
         if self.__debug: print("Get import utterance button")
         selector = "//*[text()='Import Training Examples']"
         return self.driver.find_element_by_xpath(selector)
+
+    def __get_slots_section(self):
+        if self.__debug: print("Get slots section")
+        return self.__get_export_headers()[0]
+
+    def __get_slots_dot_button(self):
+        if self.__debug: print("Get slots dot button")
+        slot_section = self.__get_slots_section()
+        return slot_section.find_element_by_class_name('dots-icon-button')
+
+    def __get_export_slots_button(self):
+        if self.__debug: print("Get export slots button")
+        selector = "//*[text()='Export Slots']"
+        return self.driver.find_element_by_xpath(selector)
+
+    def __get_import_slots_button(self):
+        if self.__debug: print("Get import slots button")
+        selector = "//*[text()='Import Slots']"
+        return self.driver.find_element_by_xpath(selector)
+
+    def __get_slots_island(self):
+        if self.__debug: print("Get slot island")
+        return self.driver.find_elements_by_class_name('island--with-row')[0]
+
+    def __get_slot_editors(self):
+        if self.__debug: print("Get slots editors")
+        slots_island = self.__get_slots_island()
+        return slots_island.find_elements_by_class_name('slot-editor')
+
+    def __get_slot_editor_row(self, slot):
+        if self.__debug: print("Get slot editor row")
+        for editor in self.__get_slot_editors():
+            slot_name = editor.find_element_by_class_name(
+                'slot-editor__name').get_attribute('value')
+            if slot == slot_name:
+                return editor
+
+    def __get_slot_editor_button(self, slot):
+        if self.__debug: print("Get slot editor button")
+        editor_row = self.__get_slot_editor_row(slot)
+        if not editor_row:
+            return None
+        if editor_row.find_element_by_class_name(
+                'item-option__subtitle').text == 'builtin':
+            return None
+        editor_button = editor_row.find_element_by_class_name(
+                'slot-editor--action-button')
+        self.driver.execute_script(
+            "arguments[0].setAttribute('style','visibility:visible;');",
+            editor_button)
+        return editor_button
+
+    def __get_slot_modal(self):
+        if self.__debug: print("Get slot modal")
+        return self.driver.find_element_by_class_name(
+            'fullscreen-modal')
+
+    def __get_slot_modal_content(self):
+        if self.__debug: print("Get slot modal content")
+        modal = self.__get_slot_modal()
+        return modal.find_element_by_class_name('fullscreen-modal__content')
+
+    def __get_slot_modal_export_button(self):
+        if self.__debug: print("Get slot modal export button")
+        modal_content = self.__get_slot_modal_content()
+        export_button = modal_content.find_element_by_xpath("//*[text()=' Export']")
+        self.driver.execute_script(
+                "return arguments[0].scrollIntoView();", export_button)
+        return export_button
+
+    def __get_slot_modal_dialog_close_button(self):
+        modal = self.__get_modal()
+        return modal.find_element_by_class_name("modal-dialog__closeundefined")
+
+    def __get_slot_modal_close_button(self):
+        modal = self.__get_slot_modal()
+        close_button = modal.find_element_by_xpath("//*[text()='Close']")
+        self.driver.execute_script(
+                "return arguments[0].scrollIntoView();", close_button)
+        return close_button
 
     def __get_modal(self):
         if self.__debug: print("Get modal")
