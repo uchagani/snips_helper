@@ -53,8 +53,31 @@ class Intent:
         self.__deactivate()
         return slot_values
 
+    def import_slot_values(self, slot, slot_values):
+        self.logger.debug("Getting slot: {}".format(slot))
+        existing_slots = [x + '\n' for x in self.export_slot_values(slot)]
+        slots = (existing_slots + 
+                 list(set(slot_values) - set(existing_slots)))
+        self.__activate()
+        if self.__get_slot_editor_button(slot):
+            self.__get_slot_editor_button(slot).click()
+        else:
+            self.logger.debug("No slots found {}".format(
+                self.__get_slot_editor_button(slot)))
+            self.__deactivate()
+            return None
+        self.__get_slot_modal_import_button().click()
+        self.__get_modal_text_area().send_keys(slots)
+        self.__get_modal_import_button().click()
+        self.__get_slot_modal_close_button().click()
+        self.__deactivate()
+        return slots
+
     def import_utterances(self, utterances):
         self.logger.debug("Importing utterances")
+        existing_utterances = [x + '\n' for x in self.utterances()]
+        imported_utterances = (existing_utterances +
+                               list(set(utterance) - set(existing_utterances)))
         self.__activate()
         self.__get_utterance_dot_button().click()
         self.__get_import_utterance_button().click()
@@ -62,7 +85,8 @@ class Intent:
         self.__get_modal_import_button().click()
         time.sleep(1)
         self.save()
-        return
+        self.__deactivate()
+        return imported_utterances
 
     def delete_utterances(self):
         self.logger.debug("Deleting utterances")
@@ -207,6 +231,14 @@ class Intent:
                 "return arguments[0].scrollIntoView();", export_button)
         return export_button
 
+    def __get_slot_modal_import_button(self):
+        self.logger.debug("Get slot modal import button")
+        modal_content = self.__get_slot_modal_content()
+        import_button = modal_content.find_element_by_xpath("//*[text()=' Import']")
+        self.driver.execute_script(
+                "return arguments[0].scrollIntoView();", import_button)
+        return import_button
+
     def __get_slot_modal_dialog_close_button(self):
         modal = self.__get_modal()
         return modal.find_element_by_class_name("modal-dialog__closeundefined")
@@ -229,7 +261,7 @@ class Intent:
         return modal.find_element_by_class_name('modal-dialog__content')
 
     def __get_modal_text_area(self):
-        self.logger.debug("Get utterance text area")
+        self.logger.debug("Get text area")
         modal = self.__get_modal_content()
         return modal.find_element_by_tag_name('textarea')
 
