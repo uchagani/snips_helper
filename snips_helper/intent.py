@@ -56,7 +56,7 @@ class Intent:
     def import_slot_values(self, slot, slot_values):
         self.logger.debug("Getting slot: {}".format(slot))
         existing_slots = [x + '\n' for x in self.export_slot_values(slot)]
-        slots = (existing_slots + 
+        slots = (existing_slots +
                  list(set(slot_values) - set(existing_slots)))
         self.__activate()
         if self.__get_slot_editor_button(slot):
