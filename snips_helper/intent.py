@@ -1,5 +1,8 @@
 import time
 import logging
+import ast
+from .slot import Slot
+
 
 class Intent:
     def __init__(self, name, driver):
@@ -7,6 +10,7 @@ class Intent:
         self.logger.debug("Creating intent: {}".format(name))
         self.__name = name
         self.__driver = driver
+        self.__create_mode = False
 
     @property
     def name(self):
@@ -15,6 +19,16 @@ class Intent:
     @property
     def driver(self):
         return self.__driver
+
+    def create(self, utterances, slots=None):
+        self.__create_mode = True
+        self.__get_intent_name().send_keys(self.name)
+        if slots is not None:
+            self.import_slots(slots)
+        self.import_utterances(utterances)
+        self.__create_mode = False
+        self.save()
+        return
 
     def utterances(self):
         self.logger.debug("Getting utterances")
@@ -34,59 +48,100 @@ class Intent:
         slots = self.__get_modal_text_area().text.split("\n")
         self.__get_modal_close_button().click()
         self.__deactivate()
-        if slots == ['']: slots = []
-        return slots
 
-    def export_slot_values(self, slot):
-        self.logger.debug("Getting slot: {}".format(slot))
-        self.__activate()
-        if self.__get_slot_editor_button(slot):
-            self.__get_slot_editor_button(slot).click()
-        else:
-            self.logger.debug("No slots found {}".format(self.__get_slot_editor_button(slot)))
-            self.__deactivate()
-            return None
-        self.__get_slot_modal_export_button().click()
-        slot_values = self.__get_modal_text_area().text.split("\n")
-        self.__get_slot_modal_dialog_close_button().click()
-        self.__get_slot_modal_close_button().click()
-        self.__deactivate()
+        if slots == ['']:
+            return []
+
+        slot_instances = []
+        for slot in slots:
+            slot_entries = slot.split(',')
+            self.logger.debug(str(slot))
+            self.logger.debug(str(slot_entries))
+            slot_name = slot_entries[0].strip()
+
+            try:
+                slot_type = slot_entries[1].strip()
+            except:
+                slot_type = None
+
+            try:
+                slot_required = ast.literal_eval(slot_entries[2].strip(
+                ).capitalize())
+            except:
+                slot_required = False
+
+            try:
+                slot_follow_up_question = slot_entries[3].strip()
+            except:
+                slot_follow_up_question = None
+
+            s = Slot(slot_name, self.driver, slot_type, slot_required,
+                     slot_follow_up_question)
+            slot_instances.append(s)
+
+        return slot_instances
+
+    def export_slots(self):
+        slot_values = []
+        for slot in self.slots():
+            slot_values.append(slot.export_value())
         return slot_values
 
-    def import_slot_values(self, slot, slot_values):
-        self.logger.debug("Getting slot: {}".format(slot))
-        existing_slots = [x + '\n' for x in self.export_slot_values(slot)]
-        slots = (existing_slots +
-                 list(set(slot_values) - set(existing_slots)))
-        self.__activate()
-        if self.__get_slot_editor_button(slot):
-            self.__get_slot_editor_button(slot).click()
-        else:
-            self.logger.debug("No slots found {}".format(
-                self.__get_slot_editor_button(slot)))
-            self.__deactivate()
-            return None
-        self.__get_slot_modal_import_button().click()
-        self.__get_modal_text_area().send_keys(slots)
-        self.__get_modal_import_button().click()
-        self.__get_slot_modal_close_button().click()
-        self.__deactivate()
-        return slots
+    def import_slots(self, slots):
+        self.logger.debug("Importing slots")
+        existing_slots = self.export_slots()
+        unique_slots = set(existing_slots).symmetric_difference(slots)
+        unique_slots_string = "\n".join(map(str, unique_slots))
 
-    def import_utterances(self, utterances):
-        self.logger.debug("Importing utterances")
-        existing_utterances = [x + '\n' for x in self.utterances()]
-        imported_utterances = (existing_utterances +
-                               list(set(utterance) - set(existing_utterances)))
         self.__activate()
-        self.__get_utterance_dot_button().click()
-        self.__get_import_utterance_button().click()
-        self.__get_modal_text_area().send_keys(utterances)
+        self.__get_slots_dot_button().click()
+        self.__get_import_slots_button().click()
+        self.__get_modal_text_area().clear()
+        self.__get_modal_text_area().send_keys(unique_slots_string)
         self.__get_modal_import_button().click()
         time.sleep(1)
         self.save()
-        self.__deactivate()
-        return imported_utterances
+
+        return unique_slots
+
+    # def import_slot_values(self, slot, slot_values):
+    #     self.logger.debug("Getting slot: {}".format(slot))
+    #     existing_slots = [x + '\n' for x in self.export_slot_values(slot)]
+    #     slots = (existing_slots +
+    #              list(set(slot_values) - set(existing_slots)))
+    #     self.__activate()
+    #     if self.__get_slot_editor_button(slot):
+    #         self.__get_slot_editor_button(slot).click()
+    #     else:
+    #         self.logger.debug("No slots found {}".format(
+    #             self.__get_slot_editor_button(slot)))
+    #         self.__deactivate()
+    #         return None
+    #     self.__get_slot_modal_import_button().click()
+    #     self.__get_modal_text_area().send_keys(slots)
+    #     self.__get_modal_import_button().click()
+    #     self.__get_slot_modal_close_button().click()
+    #     self.__deactivate()
+    #     return slots
+    #
+    def import_utterances(self, utterances):
+        self.logger.debug("Importing utterances")
+        existing_utterances = self.utterances()
+        unique_utterances = set(existing_utterances).symmetric_difference(
+            utterances)
+
+        unique_utterance_string = "\n".join(map(str, unique_utterances))
+
+        self.__activate()
+        self.__get_utterance_dot_button().click()
+        self.__get_import_utterance_button().click()
+        self.__get_modal_text_area().clear()
+        self.__get_modal_text_area().send_keys(unique_utterance_string)
+        self.__get_modal_import_button().click()
+        time.sleep(1)
+        self.save()
+
+        return unique_utterances
 
     def delete_utterances(self):
         self.logger.debug("Deleting utterances")
@@ -97,20 +152,23 @@ class Intent:
         return
 
     def save(self):
-        self.logger.debug("Saving intent: {}".format(self.name))
-        if not self.__get_save_button():
-            self.__activate()
-        self.__get_save_button().click()
-        time.sleep(1)
-        self.__deactivate()
+        if not self.__create_mode:
+            self.logger.debug("Saving intent: {}".format(self.name))
+            if not self.__get_save_button():
+                self.__activate()
+            self.__get_save_button().click()
+            time.sleep(1)
+            self.__deactivate()
 
     def __activate(self):
-        self.logger.debug("Activating intent: {}".format(self.name))
-        self.__get_intent().click()
+        if not self.__create_mode:
+            self.logger.debug("Activating intent: {}".format(self.name))
+            self.__get_intent().click()
 
     def __deactivate(self):
-        self.logger.debug("Deactivating intent: {}".format(self.name))
-        self.__get_back_to_assistant_button().click()
+        if not self.__create_mode:
+            self.logger.debug("Deactivating intent: {}".format(self.name))
+            self.__get_back_to_assistant_button().click()
 
     def __get_intent(self):
         self.logger.debug("Getting intent: {}".format(self.name))
@@ -207,7 +265,7 @@ class Intent:
                 'item-option__subtitle').text == 'builtin':
             return None
         editor_button = editor_row.find_element_by_class_name(
-                'slot-editor--action-button')
+            'slot-editor--action-button')
         self.driver.execute_script(
             "arguments[0].setAttribute('style','visibility:visible;');",
             editor_button)
@@ -226,17 +284,19 @@ class Intent:
     def __get_slot_modal_export_button(self):
         self.logger.debug("Get slot modal export button")
         modal_content = self.__get_slot_modal_content()
-        export_button = modal_content.find_element_by_xpath("//*[text()=' Export']")
+        export_button = modal_content.find_element_by_xpath(
+            "//*[text()=' Export']")
         self.driver.execute_script(
-                "return arguments[0].scrollIntoView();", export_button)
+            "return arguments[0].scrollIntoView();", export_button)
         return export_button
 
     def __get_slot_modal_import_button(self):
         self.logger.debug("Get slot modal import button")
         modal_content = self.__get_slot_modal_content()
-        import_button = modal_content.find_element_by_xpath("//*[text()=' Import']")
+        import_button = modal_content.find_element_by_xpath(
+            "//*[text()=' Import']")
         self.driver.execute_script(
-                "return arguments[0].scrollIntoView();", import_button)
+            "return arguments[0].scrollIntoView();", import_button)
         return import_button
 
     def __get_slot_modal_dialog_close_button(self):
@@ -247,7 +307,7 @@ class Intent:
         modal = self.__get_slot_modal()
         close_button = modal.find_element_by_xpath("//*[text()='Close']")
         self.driver.execute_script(
-                "return arguments[0].scrollIntoView();", close_button)
+            "return arguments[0].scrollIntoView();", close_button)
         return close_button
 
     def __get_modal(self):
@@ -274,3 +334,7 @@ class Intent:
         self.logger.debug("Get modal import button")
         modal = self.__get_modal()
         return modal.find_element_by_xpath("//*[text()='Import']")
+
+    def __get_intent_name(self):
+        self.logger.debug("Get intent name")
+        return self.driver.find_element_by_name('intentName')
