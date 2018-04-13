@@ -28,7 +28,7 @@ class Bundle:
         self.logger.debug("Selecting bundle: {}".format(self.name))
         self.__get_bundle().click()
 
-    def get_intents(self):
+    def intents(self):
         self.logger.debug("Getting intents for: {}".format(self.name))
         self.__activate()
         intent_elements = self.driver.find_elements_by_class_name(
@@ -41,7 +41,7 @@ class Bundle:
         return intents
 
     def intent_exists(self, intent_name):
-        existing_intents = self.get_intents()
+        existing_intents = self.intents()
 
         for intent in existing_intents:
             if intent.name == intent_name:

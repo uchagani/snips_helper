@@ -40,23 +40,29 @@ class Intent:
         self.__deactivate()
         return training_data
 
-    def slots(self):
-        self.logger.debug("Getting slots")
+    def __get_slot_information(self):
+        self.logger.debug("Getting slot information")
         self.__activate()
         self.__get_slots_dot_button().click()
         self.__get_export_slots_button().click()
         slots = self.__get_modal_text_area().text.split("\n")
         self.__get_modal_close_button().click()
         self.__deactivate()
-
         if slots == ['']:
             return []
+        return slots
+
+    def modify_slot_types(self, slot, slot_values):
+        self.__activate()
+        slot.type.edit(slot_values)
+        # self.__deactivate()
+
+    def slots(self):
+        slots = self.__get_slot_information()
 
         slot_instances = []
         for slot in slots:
             slot_entries = slot.split(',')
-            self.logger.debug(str(slot))
-            self.logger.debug(str(slot_entries))
             slot_name = slot_entries[0].strip()
 
             try:
@@ -160,6 +166,9 @@ class Intent:
             time.sleep(1)
             self.__deactivate()
 
+    def __scroll_to_element(self, element):
+        self.driver.execute_script("arguments[0].scrollIntoView();", element)
+
     def __activate(self):
         if not self.__create_mode:
             self.logger.debug("Activating intent: {}".format(self.name))
@@ -208,7 +217,10 @@ class Intent:
     def __get_utterance_dot_button(self):
         self.logger.debug("Get utterance dot button")
         utterance_section = self.__get_utterance_section()
-        return utterance_section.find_element_by_class_name('dots-icon-button')
+        uttterance_dot_button = utterance_section.find_element_by_class_name(
+            'dots-icon-button')
+        self.__scroll_to_element(uttterance_dot_button)
+        return uttterance_dot_button
 
     def __get_export_utterance_button(self):
         self.logger.debug("Get export utterance button")

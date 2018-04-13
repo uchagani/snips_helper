@@ -1,5 +1,6 @@
 import time
 import logging
+from .slot_type import SlotType
 
 class Slot:
     def __init__(self, name, driver, slot_type, slot_required=False,
@@ -8,7 +9,12 @@ class Slot:
         self.logger.debug("Creating slot: {}".format(name))
         self.__name = name
         self.__driver = driver
-        self.__slot_type = slot_type
+
+        if slot_type is not None:
+            self.__slot_type = SlotType(slot_type, self.driver)
+        else:
+            self.__slot_type = slot_type
+
         self.__slot_required = slot_required
         self.__follow_up_quesion = follow_up_quesion
 
@@ -34,15 +40,11 @@ class Slot:
 
     def export_value(self):
         export = self.name
-
         if self.type:
             export = "{}, {}".format(export, str(self.type).lower())
-
         if self.required:
             export =  "{}, {}".format(export, str(self.required).lower())
-
         if self.follow_up_quesion:
             export = "{}, {}".format(export, self.follow_up_quesion)
 
         return export
-
