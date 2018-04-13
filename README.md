@@ -1,4 +1,5 @@
-A quick helper to make re-training and downloading [Snips.ai](https://console.snips.ai) assistants easier using a headless chrome browser.
+A quick helper to make using [Snips.ai]
+(https://console.snips.ai) easier.
 
 ## Install
 
@@ -6,7 +7,16 @@ A quick helper to make re-training and downloading [Snips.ai](https://console.sn
 pip3 install snips_helper
 ```
 
-The installation instructions below have been tested on a raspberry pi 3 with Raspbian Stretch Lite.  For other platforms, install the latest chrome browser and chromedriver.  See Usage at the end of this document for instructions on how to use snips_helper.  This has only been tested with python3 and as such is listed as a requirement.
+The installation instructions below are only necessary if you want to use
+snips_helper to download or modify your assistant.  If you only want to use
+snips_helper to make parsing intents easier, the browser/driver instructions
+can be skipped.
+
+The installation instructions below have been tested on a raspberry pi 3 with
+Raspbian Stretch Lite.  For other platforms, install the latest chrome browser
+and chromedriver.  See Usage at the end of this document for instructions on
+how to use snips_helper.  This has only been tested with python3 and as such is
+ listed as a requirement.
 
 ## Pre-reqs
 ```
@@ -40,7 +50,7 @@ sudo apt-get install -f
 sudo dpkg -i chromium-driver_63.0.3239.84-1~deb9u1_armhf.deb
 ```
 
-## Usage
+## Usage (for snips console)
 
 ```python
 from snips_helper import ConsoleHelper
@@ -64,3 +74,29 @@ snips_helper.retrain_assistant()
 #downloading the assistant may take a minute or so.  
 snips_helper.download_assistant()
 ```
+
+
+## Usage (for parsing intents)
+
+```python
+from snips_helper import IntentParser
+
+intent = IntentParser(your_intent_data_from_mqtt_message)
+
+intent_name = intent.name
+raw_data = intent.raw_data #this is the data you passed in
+parsed_data = intent.parsed_data #this is your parsed data as a json
+object
+session_id = intent.session_id
+custom_data = intent.custom_data #no parsing is done on this (yet)
+site_id = intent.site_id
+input_text = intent.input_text
+probability = intent.probability
+slots = intent.slots #this will return an array of SlotParser objects
+
+for slot in slots:
+    raw_value = slot.raw_value
+    value = slot.value
+    name = slot.name
+```
+
