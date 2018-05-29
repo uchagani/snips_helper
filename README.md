@@ -92,11 +92,7 @@ custom_data = intent.custom_data #no parsing is done on this (yet)
 site_id = intent.site_id
 input_text = intent.input_text
 probability = intent.probability
-slots = intent.slots #this will return an array of SlotParser objects
-
-for slot in slots:
-    raw_value = slot.raw_value
-    value = slot.value
-    name = slot.name
+slots = intent.slots #this will return a dict of slots as slotName/slotValue
+pairs
 ```
 
