@@ -19,11 +19,9 @@ class IntentParser:
         self.__probability = parsed_data['intent']['probability']
 
         slots = parsed_data['slots']
-        parsed_slots = {}
+        parsed_slots = []
         for slot in slots:
-            s = SlotParser(slot)
-            parsed_slots[s.name] = s.value
-            parsed_slots["{}_raw".format(s.name)] = s.raw_value
+            parsed_slots.append(SlotParser(slot))
 
         self.__slots = parsed_slots
 
